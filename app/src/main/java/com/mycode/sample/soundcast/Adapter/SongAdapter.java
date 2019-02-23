@@ -1,6 +1,7 @@
 package com.mycode.sample.soundcast.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.mycode.sample.soundcast.MusicPlayerActivity;
 import com.squareup.picasso.Picasso;
 import com.mycode.sample.soundcast.R;
 import com.mycode.sample.soundcast.SongList;
@@ -59,29 +62,56 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
                     if (!getResult.get(i).getThumbnail().contains(".jpeg")&&!getResult.get(i).getThumbnail().contains(".jpg")){
                         Picasso.with(context).load(R.drawable.musicicon).into(songViewHolder.imageViewSong);
                     }else {
-                        songViewHolder.tv_title.setText(getResult.get(i).getTitle());
+                        myView.tv_title.setText(getResult.get(i).getTitle());
                         Log.d("TAG !!!!!",""+getResult.get(i).getTitle());
-                        Picasso.with(context).load(getResult.get(i).getThumbnail()).into(songViewHolder.imageViewSong);
+                        Picasso.with(context).load(getResult.get(i).getThumbnail()).into(myView.imageViewSong);
                     }
                 }
-
             }
-
-            songViewHolder.downloadSongButton.setOnClickListener(new View.OnClickListener() {
+            myView.downloadSongButton.setTag(R.string.KEY1,i);
+            if(checkIfSongExist(getResult.get(i).getTitle())){
+                myView.downloadSongButton.setBackgroundResource(R.drawable.play_song_icon);
+                myView.downloadSongButton.setTag(R.string.KEY2, "present");
+            }else{
+                myView.downloadSongButton.setBackgroundResource(R.drawable.ic_file_download_black_24dp);
+                myView.downloadSongButton.setTag(R.string.KEY2, "absent");
+            }
+            myView.downloadSongButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    getSongNameToDisplay = getResult.get(i).getTitle();
-                    SongList downloadService = createService(SongList.class, "https://static.talview.com/");
-                    downloadService.downloadFileByUrlRx("hiring/android/soundcast/mp3/fast-and-furious.mp3")
-                            .flatMap(processResponse())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(handleResult());
+                    if(String.valueOf(view.getTag(R.string.KEY2)).equalsIgnoreCase("present")){
+                        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                                "/Alarms/" + context.getPackageName() + "/games/"+getResult.get(i).getTitle()+".mp3");
+                        if (file.exists()){
+                            Log.d("TAG!!",""+file.getAbsolutePath());
+                            Intent intent = new Intent(context,MusicPlayerActivity.class);
+                            intent.putExtra("songToPlay",file.getAbsolutePath());
+                            context.startActivity(intent);
+                        }else {
+                            Log.d("TAG!!","File NOt Found!!");
+                        }
+                    }else{
+                        getSongNameToDisplay = getResult.get((int)view.getTag(R.string.KEY1)).getTitle();
+                        SongList downloadService = createService(SongList.class, "https://static.talview.com/hiring/android/soundcast/mp3/");
+                        downloadService.downloadFileByUrlRx(getResult.get(i).getLink())
+                                .flatMap(processResponse())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(handleResult());
+                    }
+
                 }
             });
         }
     }
+    private boolean checkIfSongExist(String title){
+        File downloadedFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                "/Alarms/" + context.getPackageName() + "/games/"+title+".mp3");
 
+        if(downloadedFile.exists())
+            return true;
+        return false;
+    }
     @Override
     public int getItemCount() {
         return getResult.size();
@@ -98,8 +128,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
         return io.reactivex.Observable.create(new ObservableOnSubscribe<File>() {
             @Override
             public void subscribe(ObservableEmitter<File> subscriber) throws Exception {
-                String header = responseBodyResponse.headers().get("Content-Disposition");
-                //String filename = header.replace("attachment; filename=", "");
                File myFile =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Alarms/" + context.getPackageName()+ "/games/");
                 if (!myFile.exists()){
                     myFile.mkdirs();
@@ -140,17 +168,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             @Override
             public void onComplete() {
                 Log.d("TAG", "onCompleted");
-                file = new File(String.valueOf(destinationFile));
-                if (file.exists()){
-                    if (!isDownloaded){
-                        isDownloaded = true;
-                        myView.downloadSongButton.setBackgroundResource(R.drawable.play_song_icon);
-                        notifyDataSetChanged();
-                    }
-
-                }else {
-                    isDownloaded = false;
-                }
+                notifyDataSetChanged();
 
             }
         };

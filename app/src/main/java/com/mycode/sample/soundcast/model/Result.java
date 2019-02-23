@@ -7,7 +7,7 @@ import static com.mycode.sample.soundcast.Constants.isDownloaded;
 
 
 public class Result {
-
+    private Boolean isDownloaded = false;
     @SerializedName("objectId")
     @Expose
     private String objectId;
@@ -66,12 +66,11 @@ public class Result {
     }
 
     public String getLink() {
-        if (link != null){
-            isDownloaded = false;
-        }
         return link;
     }
+    public Boolean getDownloaded() { return isDownloaded; }
 
+    public void setDownloaded(Boolean downloaded) { isDownloaded = downloaded; }
     public void setLink(String link) {
         this.link = link;
     }

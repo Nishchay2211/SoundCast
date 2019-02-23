@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Sound Cast</string>
+    <string name="KEY1">1</string>
+    <string name="KEY2">2</string>
 </resources>

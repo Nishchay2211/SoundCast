@@ -2,6 +2,7 @@ package com.mycode.sample.soundcast;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -25,30 +26,28 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.mycode.sample.soundcast.MusicPlayerActivity.mediaPlayer;
+
 public class MainActivity extends Activity {
     SongList songList;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
     List<Result> results = new ArrayList<Result>();
     RecyclerView recycle_Song;
-    FloatingActionButton checkDownload;
+    SongAdapter songAdapter;
+    MusicPlayerActivity musicPlayerActivity = new MusicPlayerActivity();
+    //FloatingActionButton checkDownload;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         askForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 101);
         recycle_Song = (RecyclerView)findViewById(R.id.recycle_Song);
-        checkDownload = (FloatingActionButton)findViewById(R.id.checkDownload);
+        //checkDownload = (FloatingActionButton)findViewById(R.id.checkDownload);
         songList = ApiUtils.getSongService();
         recycle_Song.setHasFixedSize(true);
         recycle_Song.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         fetchData();
-
-        checkDownload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "FB Pressed", Toast.LENGTH_SHORT).show();
-            }
-        });
+        //startService(new Intent(this,MediaPlayerService.class));
     }
     private void fetchData() {
         compositeDisposable.add(songList.getSongDetails()
@@ -57,17 +56,16 @@ public class MainActivity extends Activity {
                 .subscribe(new Consumer<GetSongDetails>() {
                     @Override
                     public void accept(final GetSongDetails getSongDetails) throws Exception {
-                        results = getSongDetails.getResults();
-                        if (results!= null){
-                            for (int i =0;i<results.size();i++){
-                                if (results.get(i).getTitle()!= null && results.get(i).getLink().contains(".mp3")){
-                                    Log.d("TAG....",""+results.get(i).getTitle());
-                                    SongAdapter songAdapter = new SongAdapter(MainActivity.this,results);
-                                    recycle_Song.setAdapter(songAdapter);
-                                    songAdapter.notifyDataSetChanged();
+                        List<Result> tempResults = getSongDetails.getResults();
+                        if (tempResults!= null){
+                            for (Result tempResult : tempResults){
+                                if (tempResult.getTitle()!= null && tempResult.getLink().contains(".mp3")){
+                                    results.add(tempResult);
                                 }
                             }
                         }
+                        songAdapter = new SongAdapter(MainActivity.this,results);
+                        recycle_Song.setAdapter(songAdapter);
                     }
                 }));
     }
@@ -100,4 +98,12 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (songAdapter != null)
+        songAdapter.notifyDataSetChanged();
+
+    }
 }
