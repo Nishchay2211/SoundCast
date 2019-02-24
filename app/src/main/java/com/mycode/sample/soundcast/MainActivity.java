@@ -48,6 +48,9 @@ public class MainActivity extends Activity {
         recycle_Song.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         fetchData();
         //startService(new Intent(this,MediaPlayerService.class));
+        if (mediaPlayer != null &&mediaPlayer.isPlaying()){
+            Log.d("TAG", "onCompletedrrrrrrrr");
+        }
     }
     private void fetchData() {
         compositeDisposable.add(songList.getSongDetails()
@@ -69,8 +72,6 @@ public class MainActivity extends Activity {
                     }
                 }));
     }
-
-
     private void askForPermission(String permission, Integer requestCode) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
 
@@ -85,7 +86,6 @@ public class MainActivity extends Activity {
             Toast.makeText(getApplicationContext(), "Permission was denied", Toast.LENGTH_SHORT).show();
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -97,13 +97,17 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
-        if (songAdapter != null)
-        songAdapter.notifyDataSetChanged();
+        if (songAdapter != null){
+            songAdapter.notifyDataSetChanged();
+        }
+
+        if (mediaPlayer != null &&mediaPlayer.isPlaying()){
+            Log.d("TAG", "onCompletedrrrrrrrr");
+            mediaPlayer.stop();
+        }
 
     }
 }

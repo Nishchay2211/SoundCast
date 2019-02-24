@@ -47,7 +47,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
-
         Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
         {
@@ -94,17 +93,13 @@ public class MusicPlayerActivity extends AppCompatActivity {
         seekBarSong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                Toast.makeText(MusicPlayerActivity.this, "FFFFF3"+seekBar.getDrawingTime(), Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Toast.makeText(MusicPlayerActivity.this, "FFFFF2", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
                 mediaPlayer.seekTo(seekBar.getProgress());
-                Toast.makeText(MusicPlayerActivity.this, "FFFFF", Toast.LENGTH_SHORT).show();
             }
         });
         pauseSongButton.setOnClickListener(new View.OnClickListener() {
