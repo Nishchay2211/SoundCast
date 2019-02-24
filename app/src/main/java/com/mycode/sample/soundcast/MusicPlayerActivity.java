@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -52,7 +53,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         String path = Environment.getExternalStorageDirectory().toString()+"/SoundCast/Talview/Audio";
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
-       files  = directory.listFiles();
+        files  = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
         sogArrayList = new ArrayList<>();
         for (int i = 0; i < files.length; i++)
@@ -175,5 +176,14 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 mediaPlayer.start();
             }
         });
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+               super.onBackPressed();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

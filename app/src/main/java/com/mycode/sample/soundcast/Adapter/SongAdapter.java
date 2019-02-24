@@ -212,7 +212,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
             @Override
             public void onError(Throwable e) {
-                Log.d("TAG", "Error " + e.getMessage());
+                Toast.makeText(context,""+e.getMessage(),Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onComplete() {
@@ -235,7 +235,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
             @Override
             public void onError(Throwable e) {
-                Log.d("TAG", "Error " + e.getMessage());
+                Toast.makeText(context,""+e.getMessage(),Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onComplete() {

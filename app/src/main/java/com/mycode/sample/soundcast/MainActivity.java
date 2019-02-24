@@ -37,19 +37,16 @@ public class MainActivity extends Activity {
     RecyclerView recycle_Song;
     SongAdapter songAdapter;
     MusicPlayerActivity musicPlayerActivity = new MusicPlayerActivity();
-    //FloatingActionButton checkDownload;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         askForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 101);
         recycle_Song = (RecyclerView)findViewById(R.id.recycle_Song);
-        //checkDownload = (FloatingActionButton)findViewById(R.id.checkDownload);
         songList = ApiUtils.getSongService();
         recycle_Song.setHasFixedSize(true);
         recycle_Song.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         fetchData();
-        //startService(new Intent(this,MediaPlayerService.class));
         if (mediaPlayer != null && mediaPlayer.isPlaying()){
             Log.d("TAG", "onCompletedrrrrrrrr");
         }
