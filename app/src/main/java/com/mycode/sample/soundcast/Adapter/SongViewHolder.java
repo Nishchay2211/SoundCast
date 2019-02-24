@@ -15,6 +15,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public CircleImageView imageViewSong;
     public SongViewHolder(@NonNull View itemView) {
         super(itemView);
+       // myAdapterView = itemView;
         tv_title = (TextView)itemView.findViewById(R.id.textViewTitle);
         imageViewSong = (CircleImageView) itemView.findViewById(R.id.circleView);
         downloadSongButton = (Button) itemView.findViewById(R.id.downloadSongButton);

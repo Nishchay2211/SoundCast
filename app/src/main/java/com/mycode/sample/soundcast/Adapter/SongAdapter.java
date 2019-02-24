@@ -2,6 +2,7 @@ package com.mycode.sample.soundcast.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import com.mycode.sample.soundcast.SongList;
 import com.mycode.sample.soundcast.model.Result;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.ObservableEmitter;
@@ -34,14 +36,13 @@ import retrofit2.Response;
 
 import static com.mycode.sample.soundcast.Constants.isDownloaded;
 import static com.mycode.sample.soundcast.RetrofitClient.createService;
-
-
 public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
     Context context;
     List<Result> getResult;
     public static String getSongNameToDisplay;
-    File destinationFile;
+    File destinationFile,destinationFileImage;
     public static SongViewHolder myView;
+    BufferedSink bufferedSink;
     public static File file;
     public SongAdapter(Context context, List<Result> getResult) {
         this.context = context;
@@ -80,15 +81,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
                 @Override
                 public void onClick(View view) {
                     if(String.valueOf(view.getTag(R.string.KEY2)).equalsIgnoreCase("present")){
-                        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
-                                "/Alarms/" + context.getPackageName() + "/games/"+getResult.get(i).getTitle()+".mp3");
-                        if (file.exists()){
-                            Log.d("TAG!!",""+file.getAbsolutePath());
+                        File fileAudio = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                                "/SoundCast/Talview/Audio/"+getResult.get(i).getTitle()+".mp3");
+                        File fileImage = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                                "/SoundCast/Talview/Image/"+getResult.get(i).getTitle()+".jpg");
+                        if (fileAudio.exists() && fileImage.exists()){
                             Intent intent = new Intent(context,MusicPlayerActivity.class);
-                            intent.putExtra("songToPlay",file.getAbsolutePath());
+                            intent.putExtra("songToPlay",fileAudio.getAbsolutePath());
+                            intent.putExtra("songTitle",getResult.get(i).getTitle());
                             context.startActivity(intent);
                         }else {
-                            Log.d("TAG!!","File NOt Found!!");
+
                         }
                     }else{
                         getSongNameToDisplay = getResult.get((int)view.getTag(R.string.KEY1)).getTitle();
@@ -98,6 +101,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(handleResult());
+
+                        SongList downloadServiceImage = createService(SongList.class, "https://static.talview.com/hiring/android/soundcast/thumbs/");
+                        downloadServiceImage.downloadFileByUrlRx(getResult.get(i).getThumbnail())
+                                .flatMap(processResponseImage())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(handleResultImage());
                     }
 
                 }
@@ -106,7 +116,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
     }
     private boolean checkIfSongExist(String title){
         File downloadedFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
-                "/Alarms/" + context.getPackageName() + "/games/"+title+".mp3");
+                "/SoundCast/Talview/Audio/"+title+".mp3");
 
         if(downloadedFile.exists())
             return true;
@@ -124,23 +134,62 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
         };
     }
+
+    private Function<Response<ResponseBody>, io.reactivex.Observable<File>>processResponseImage(){
+        return new Function<Response<ResponseBody>, io.reactivex.Observable<File>>() {
+            @Override
+            public io.reactivex.Observable<File> apply(Response<ResponseBody> responseBodyResponse) throws Exception {
+                return saveToDiskRxImage(responseBodyResponse);
+            }
+        };
+    }
+
+
+
+    private io.reactivex.Observable<File> saveToDiskRxImage(final Response<ResponseBody> responseBodyResponse) {
+        return io.reactivex.Observable.create(new ObservableOnSubscribe<File>() {
+            @Override
+            public void subscribe(ObservableEmitter<File> subscriber) throws Exception {
+                File myFile =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/SoundCast/Talview/Image/");
+                if (!myFile.exists()){
+                    myFile.mkdirs();
+                    destinationFileImage = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                            "/SoundCast/Talview/Image/"+getSongNameToDisplay+".jpg");
+                    BufferedSink bufferedSink = Okio.buffer(Okio.sink(destinationFileImage));
+                    bufferedSink.writeAll(responseBodyResponse.body().source());
+                    bufferedSink.close();
+                    subscriber.onNext(destinationFileImage);
+                    subscriber.onComplete();
+                }else {
+                    destinationFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
+                            "/SoundCast/Talview/Image/"+getSongNameToDisplay+".jpg");
+                    BufferedSink bufferedSink = Okio.buffer(Okio.sink(destinationFile));
+                    bufferedSink.writeAll(responseBodyResponse.body().source());
+                    bufferedSink.close();
+                    subscriber.onNext(destinationFile);
+                    subscriber.onComplete();
+                }
+
+            }
+        });
+    }
     private io.reactivex.Observable<File> saveToDiskRx(final Response<ResponseBody> responseBodyResponse) {
         return io.reactivex.Observable.create(new ObservableOnSubscribe<File>() {
             @Override
             public void subscribe(ObservableEmitter<File> subscriber) throws Exception {
-               File myFile =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Alarms/" + context.getPackageName()+ "/games/");
+               File myFile =  new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/SoundCast/Talview/Audio/");
                 if (!myFile.exists()){
                     myFile.mkdirs();
                     destinationFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
-                            "/Alarms/" + context.getPackageName() + "/games/"+getSongNameToDisplay+".mp3");
-                    BufferedSink bufferedSink = Okio.buffer(Okio.sink(destinationFile));
+                            "/SoundCast/Talview/Audio/"+getSongNameToDisplay+".mp3");
+                    bufferedSink = Okio.buffer(Okio.sink(destinationFile));
                     bufferedSink.writeAll(responseBodyResponse.body().source());
                     bufferedSink.close();
                     subscriber.onNext(destinationFile);
                     subscriber.onComplete();
                 }else {
                     destinationFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
-                            "/Alarms/" + context.getPackageName() + "/games/"+getSongNameToDisplay+".mp3");
+                            "/SoundCast/Talview/Audio/"+getSongNameToDisplay+".mp3");
                     BufferedSink bufferedSink = Okio.buffer(Okio.sink(destinationFile));
                     bufferedSink.writeAll(responseBodyResponse.body().source());
                     bufferedSink.close();
@@ -168,6 +217,29 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             @Override
             public void onComplete() {
                 Log.d("TAG", "onCompleted");
+                notifyDataSetChanged();
+
+            }
+        };
+    }
+
+    private Observer<? super File> handleResultImage() {
+        return new Observer<File>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.d("TAG Image", "File downloaded to ");
+            }
+            @Override
+            public void onNext(File file) {
+                Log.d("TAG Image", "File downloaded to " + file.getAbsolutePath());
+            }
+            @Override
+            public void onError(Throwable e) {
+                Log.d("TAG", "Error " + e.getMessage());
+            }
+            @Override
+            public void onComplete() {
+                Log.d("TAG Image", "onCompleted");
                 notifyDataSetChanged();
 
             }

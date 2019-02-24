@@ -16,16 +16,11 @@ public interface SongList {
     })
     @GET("songs_library")
     Observable<GetSongDetails> getSongDetails();
-
-    @Streaming
-    @GET
-    Observable<Response<ResponseBody>> downloadFile(@Url String fileUrl);
-
-    @Streaming
-    @GET("/resource/path_to_file_with_extension")
-    Call<ResponseBody> downloadFileStatic(@Url String fileUrl);
-
     @Streaming
     @GET
     Observable<Response<ResponseBody>> downloadFileByUrlRx(@Url String fileUrl);
+
+    @Streaming
+    @GET
+    Observable<Response<ResponseBody>> downloadFileImageByUrlRx(@Url String fileUrl);
 }

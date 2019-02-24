@@ -26,6 +26,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.mycode.sample.soundcast.Adapter.SongAdapter.myView;
+
 import static com.mycode.sample.soundcast.MusicPlayerActivity.mediaPlayer;
 
 public class MainActivity extends Activity {
@@ -48,7 +50,7 @@ public class MainActivity extends Activity {
         recycle_Song.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         fetchData();
         //startService(new Intent(this,MediaPlayerService.class));
-        if (mediaPlayer != null &&mediaPlayer.isPlaying()){
+        if (mediaPlayer != null && mediaPlayer.isPlaying()){
             Log.d("TAG", "onCompletedrrrrrrrr");
         }
     }
@@ -74,7 +76,6 @@ public class MainActivity extends Activity {
     }
     private void askForPermission(String permission, Integer requestCode) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
@@ -103,11 +104,8 @@ public class MainActivity extends Activity {
         if (songAdapter != null){
             songAdapter.notifyDataSetChanged();
         }
-
         if (mediaPlayer != null &&mediaPlayer.isPlaying()){
             Log.d("TAG", "onCompletedrrrrrrrr");
-            mediaPlayer.stop();
         }
-
     }
 }
