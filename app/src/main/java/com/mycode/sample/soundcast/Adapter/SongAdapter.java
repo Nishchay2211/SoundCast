@@ -34,7 +34,6 @@ import okio.BufferedSink;
 import okio.Okio;
 import retrofit2.Response;
 
-import static com.mycode.sample.soundcast.Constants.isDownloaded;
 import static com.mycode.sample.soundcast.RetrofitClient.createService;
 public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
     Context context;
@@ -77,6 +76,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
                 myView.downloadSongButton.setBackgroundResource(R.drawable.ic_file_download_black_24dp);
                 myView.downloadSongButton.setTag(R.string.KEY2, "absent");
             }
+
             myView.downloadSongButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -92,6 +92,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
                             context.startActivity(intent);
                         }else {
 
+                            Toast.makeText(context,"File Not Found!!",Toast.LENGTH_SHORT).show();
                         }
                     }else{
                         getSongNameToDisplay = getResult.get((int)view.getTag(R.string.KEY1)).getTitle();
@@ -143,9 +144,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
         };
     }
-
-
-
     private io.reactivex.Observable<File> saveToDiskRxImage(final Response<ResponseBody> responseBodyResponse) {
         return io.reactivex.Observable.create(new ObservableOnSubscribe<File>() {
             @Override
@@ -204,11 +202,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
         return new Observer<File>() {
             @Override
             public void onSubscribe(Disposable d) {
-                Log.d("TAG", "File downloaded to ");
+                Toast.makeText(context, "Please Wait Till Application Downloads The Song !", Toast.LENGTH_LONG).show();
             }
             @Override
             public void onNext(File file) {
-                Log.d("TAG", "File downloaded to " + file.getAbsolutePath());
             }
             @Override
             public void onError(Throwable e) {
@@ -216,7 +213,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
             @Override
             public void onComplete() {
-                Log.d("TAG", "onCompleted");
+                Toast.makeText(context, "File Download Completed, Enjoy Your Music Offline Now !", Toast.LENGTH_LONG).show();
                 notifyDataSetChanged();
 
             }
@@ -227,7 +224,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
         return new Observer<File>() {
             @Override
             public void onSubscribe(Disposable d) {
-                Log.d("TAG Image", "File downloaded to ");
+                Toast.makeText(context, "Please Wait Till Application Downloads The Song !", Toast.LENGTH_LONG).show();
             }
             @Override
             public void onNext(File file) {
@@ -235,11 +232,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
             }
             @Override
             public void onError(Throwable e) {
-                Toast.makeText(context,""+e.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Found Different Base URL From Server !",Toast.LENGTH_LONG).show();
             }
             @Override
             public void onComplete() {
-                Log.d("TAG Image", "onCompleted");
+                Toast.makeText(context, "File Download Completed, Enjoy Your Music Offline Now !", Toast.LENGTH_LONG).show();
                 notifyDataSetChanged();
 
             }

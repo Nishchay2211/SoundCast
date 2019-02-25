@@ -58,10 +58,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
         sogArrayList = new ArrayList<>();
         for (int i = 0; i < files.length; i++)
         {
-            Log.d("Files", "FileName:" + files[i].getAbsolutePath());
             sogArrayList.add(new File(files[i].getAbsolutePath()));
         }
-        Log.d("LLLLKKKKK",""+sogArrayList);
         songName = sogArrayList.get(position).getAbsolutePath();
         seekBarUpdate = new Thread(){
             @Override
@@ -84,7 +82,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
         if (intent != null){
             getDownloadedMusicPath = intent.getStringExtra("songToPlay");
             songTitle = intent.getStringExtra("songTitle");
-            Log.d("TAG...........",""+getDownloadedMusicPath);
         }
         File fileImage = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
                 "/SoundCast/Talview/Image/"+songTitle+".jpg");
@@ -149,7 +146,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 File fileImage = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+
                         "/SoundCast/Talview/Image/"+songName.replace(".mp3","")+".jpg");
                 displaySongTitle.setText(songName);
-                Log.d("MusicAppTag....",""+fileImage);
                 Picasso.with(getApplicationContext()).load(fileImage).into(displaySongThumbnail);
                 mediaPlayer.start();
             }

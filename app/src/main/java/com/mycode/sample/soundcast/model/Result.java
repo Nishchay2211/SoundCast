@@ -3,7 +3,6 @@ package com.mycode.sample.soundcast.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import static com.mycode.sample.soundcast.Constants.isDownloaded;
 
 
 public class Result {

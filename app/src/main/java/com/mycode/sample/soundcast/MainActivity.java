@@ -47,9 +47,6 @@ public class MainActivity extends Activity {
         recycle_Song.setHasFixedSize(true);
         recycle_Song.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         fetchData();
-        if (mediaPlayer != null && mediaPlayer.isPlaying()){
-            Log.d("TAG", "onCompletedrrrrrrrr");
-        }
     }
     private void fetchData() {
         compositeDisposable.add(songList.getSongDetails()
@@ -88,7 +85,6 @@ public class MainActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED) {
-
             if (requestCode == 101)
                 Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
         } else {
@@ -102,7 +98,7 @@ public class MainActivity extends Activity {
             songAdapter.notifyDataSetChanged();
         }
         if (mediaPlayer != null &&mediaPlayer.isPlaying()){
-            Log.d("TAG", "onCompletedrrrrrrrr");
+           mediaPlayer.stop();
         }
     }
 }

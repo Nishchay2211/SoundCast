@@ -21,10 +21,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".MediaPlayerService"
-            android:enabled="true" />
-
         <activity android:name=".MusicPlayerActivity" />
         <activity android:name=".MainActivity"></activity>
     </application>

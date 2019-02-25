@@ -20,7 +20,5 @@ public interface SongList {
     @GET
     Observable<Response<ResponseBody>> downloadFileByUrlRx(@Url String fileUrl);
 
-    @Streaming
-    @GET
-    Observable<Response<ResponseBody>> downloadFileImageByUrlRx(@Url String fileUrl);
+
 }
